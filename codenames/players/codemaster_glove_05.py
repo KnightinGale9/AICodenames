@@ -8,7 +8,7 @@ from players.codemaster import Codemaster
 
 
 class AICodemaster(Codemaster):
-
+    #initialization 
     def __init__(self, brown_ic=None, glove_vecs=None, word_vectors=None):
         super().__init__()
         self.brown_ic = brown_ic
@@ -20,37 +20,40 @@ class AICodemaster(Codemaster):
         with open('players/cm_wordlist.txt') as infile:
             for line in infile:
                 self.cm_wordlist.append(line.rstrip())
-
+        
         self.bad_word_dists = None
         self.red_word_dists = None
-
+    #self storage for game state??
     def set_game_state(self, words, maps):
         self.words = words
         self.maps = maps
-
+        
+    #get similarity calculation of a word
     def get_clue(self):
         cos_dist = scipy.spatial.distance.cosine
         red_words = []
         bad_words = []
 
-        # Creates Red-Labeled Word arrays, and everything else arrays
+        # Creates Red-Labeled Word arrays, and everything else arrays (looking at 25 words aka full board)
         for i in range(25):
-            if self.words[i][0] == '*':
+            if self.words[i][0] == '*': #word is blank
                 continue
-            elif self.maps[i] == "Assassin" or self.maps[i] == "Blue" or self.maps[i] == "Civilian":
+            #sorting the words that are revealed
+            elif self.maps[i] == "Assassin" or self.maps[i] == "Blue" or self.maps[i] == "Civilian": 
                 bad_words.append(self.words[i].lower())
             else:
                 red_words.append(self.words[i].lower())
         print("RED:\t", red_words)
-
+        
         all_vectors = (self.glove_vecs,)
         bests = {}
-
+        
+        #run on the first instance??
         if not self.bad_word_dists:
-            self.bad_word_dists = {}
+            self.bad_word_dists = {}#convert the object to a dictionary 
             for word in bad_words:
-                self.bad_word_dists[word] = {}
-                for val in self.cm_wordlist:
+                self.bad_word_dists[word] = {} #dictionary of dictionary
+                for val in self.cm_wordlist:#a callculation
                     b_dist = cos_dist(self.concatenate(val, all_vectors), self.concatenate(word, all_vectors))
                     self.bad_word_dists[word][val] = b_dist
 
@@ -61,14 +64,14 @@ class AICodemaster(Codemaster):
                     b_dist = cos_dist(self.concatenate(val, all_vectors), self.concatenate(word, all_vectors))
                     self.red_word_dists[word][val] = b_dist
 
-        else:
+        else:#????
             to_remove = set(self.bad_word_dists) - set(bad_words)
             for word in to_remove:
                 del self.bad_word_dists[word]
             to_remove = set(self.red_word_dists) - set(red_words)
             for word in to_remove:
                 del self.red_word_dists[word]
-
+        
         for clue_num in range(1, 3 + 1):
             best_per_dist = np.inf
             best_per = ''
@@ -81,7 +84,7 @@ class AICodemaster(Codemaster):
                         continue
 
                     bad_dist = np.inf
-                    worst_bad = ''
+                    worst_bad = ''#what is this for ???
                     for bad_word in self.bad_word_dists:
                         if self.bad_word_dists[bad_word][word] < bad_dist:
                             bad_dist = self.bad_word_dists[bad_word][word]
@@ -96,7 +99,7 @@ class AICodemaster(Codemaster):
                         best_dist = worst_red
                         best_word = word
                         # print(worst_red,red_word,word)
-
+                        #only runs three times?
                         if best_dist < best_per_dist:
                             best_per_dist = best_dist
                             best_per = best_word
