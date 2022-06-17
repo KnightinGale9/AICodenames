@@ -11,11 +11,13 @@ class AICodemaster(Codemaster):
     #initialization 
     def __init__(self, brown_ic=None, glove_vecs=None, word_vectors=None):
         super().__init__()
+        #why are we initializing these 
         self.brown_ic = brown_ic
         self.glove_vecs = glove_vecs
         self.word_vectors = word_vectors
         self.wordnet_lemmatizer = WordNetLemmatizer()
         self.lancaster_stemmer = LancasterStemmer()
+        #end
         self.cm_wordlist = []
         with open('players/cm_wordlist.txt') as infile:
             for line in infile:
