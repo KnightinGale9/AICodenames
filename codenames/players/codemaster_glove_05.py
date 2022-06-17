@@ -47,7 +47,7 @@ class AICodemaster(Codemaster):
                 red_words.append(self.words[i].lower())
         print("RED:\t", red_words)
         
-        all_vectors = (self.glove_vecs,)
+        all_vectors = (self.glove_vecs,)#???
         bests = {}
         
         #run on the first instance??
