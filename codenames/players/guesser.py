@@ -8,6 +8,10 @@ class Guesser(ABC):
         pass
 
     @abstractmethod
+    def get_name(self):
+        return self.name
+
+    @abstractmethod
     def set_board(self, words_on_board):
         """Set function for the current game board"""
         pass

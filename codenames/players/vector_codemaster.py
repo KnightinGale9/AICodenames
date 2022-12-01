@@ -14,6 +14,7 @@ class VectorCodemaster(Codemaster):
     def __init__(self, **kwargs):
         """Set up word list and handle pretrained vectors"""
         super().__init__()
+        self.name="AICodemaster.vector"
 
         glove_vecs = kwargs.get("glove_vecs", None)
         word_vectors = kwargs.get("word_vectors", None)

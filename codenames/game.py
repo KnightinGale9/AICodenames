@@ -191,6 +191,8 @@ class Game:
         """Function that takes in an int index called guess to compare with the key grid
         CodeMaster will always win with Red and lose if Blue =/= 7 or Assassin == 1
         """
+        if guess_index is None:
+            return GameCondition.CONTINUE
         if self.key_grid[guess_index] == "Red":
             self.words_on_board[guess_index] = "*Red*"
             if self.words_on_board.count("*Red*") >= 8:
@@ -238,16 +240,16 @@ class Game:
         with open("results/bot_results.txt", "a") as f:
             f.write(
                 f'TOTAL:{num_of_turns} B:{blue_result} C:{civ_result} A:{assa_result}'
-                f' R:{red_result} CM:{type(self.codemaster).__name__} '
-                f'GUESSER:{type(self.guesser).__name__} SEED:{self.seed}\n'
+                f' R:{red_result} CM:{self.codemaster.get_name()} '
+                f'GUESSER:{self.guesser.get_name()} SEED:{self.seed}\n'
             )
 
         with open("results/bot_results_new_style.txt", "a") as f:
             results = {"game_name": self.game_name,
                        "total_turns": num_of_turns,
                        "R": red_result, "B": blue_result, "C": civ_result, "A": assa_result,
-                       "codemaster": type(self.codemaster).__name__,
-                       "guesser": type(self.guesser).__name__,
+                       "codemaster": self.codemaster.get_name(),
+                       "guesser": self.guesser.get_name(),
                        "seed": self.seed,
                        "time_s": (self.game_end_time - self.game_start_time),
                        "cm_kwargs": {k: v if isinstance(v, float) or isinstance(v, int) or isinstance(v, str) else None
@@ -295,7 +297,10 @@ class Game:
                 # if no comparisons were made/found than retry input from codemaster
                 if guess_answer is None or guess_answer == "no comparisons":
                     break
-                guess_answer_index = words_in_play.index(guess_answer.upper().strip())
+                if guess_answer == "":
+                    guess_answer_index = None
+                else:
+                    guess_answer_index = words_in_play.index(guess_answer.upper().strip())
                 game_condition = self._accept_guess(guess_answer_index)
 
                 if game_condition == GameCondition.HIT_RED:

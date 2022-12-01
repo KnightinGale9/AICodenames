@@ -1,11 +1,15 @@
 from abc import ABC, abstractmethod
 
+
 class Codemaster(ABC):
     """codemaster abstract class that mimics the spymaster in the codenames game"""
 
     def __init__(self):
         """Set up word list and handle pretrained vectors"""
         pass
+    @abstractmethod
+    def get_name(self):
+        return self.name
 
     @abstractmethod
     def set_game_state(self, words_on_board, key_grid):
@@ -24,10 +28,13 @@ class HumanCodemaster(Codemaster):
         super().__init__()
         pass
 
+    def get_name(self):
+        return "HumanCodemaster"
+
     def set_game_state(self, words_in_play, map_in_play):
         self.words = words_in_play
         self.maps = map_in_play
-        
+
     def get_clue(self):
         clue_input = input("Input CM Clue:\nPlease enter a Word followed by a space and a Number >> ")
         clue_input = clue_input.strip()

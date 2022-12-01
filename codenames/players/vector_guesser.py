@@ -11,6 +11,7 @@ class VectorGuesser(Guesser):
     def __init__(self, **kwargs):
         """Handle pretrained vectors and declare instance vars"""
         super().__init__()
+        self.name = "AIGuesser.vector"
 
         glove_vecs = kwargs.get("glove_vecs", None)
         word_vectors = kwargs.get("word_vectors", None)
