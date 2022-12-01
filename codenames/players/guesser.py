@@ -39,6 +39,9 @@ class HumanGuesser(Guesser):
         super().__init__()
         pass
 
+    def get_name(self):
+        return "HumanGuesser"
+
     def set_clue(self, clue, num):
         print("The clue is:", clue, num)
 
