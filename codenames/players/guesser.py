@@ -44,6 +44,7 @@ class HumanGuesser(Guesser):
 
     def set_clue(self, clue, num):
         print("The clue is:", clue, num)
+        self.num = num
 
     def set_board(self, words):
         self.words = words
@@ -51,7 +52,8 @@ class HumanGuesser(Guesser):
     def get_answer(self):
         answer_input = input("Guesser makes turn.\nPlease enter a valid Word >> ")
         type(answer_input)
-
+        if answer_input == "":
+            return answer_input
         while not self._is_valid(answer_input):
             print("Input Invalid")
             print(self.words)
@@ -60,7 +62,7 @@ class HumanGuesser(Guesser):
         return answer_input
 
     def keep_guessing(self):
-        return True
+        return self.num >= 0
 
     def _is_valid(self, result):
         if result.upper() in self.words:
