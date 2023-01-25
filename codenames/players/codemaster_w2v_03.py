@@ -25,6 +25,9 @@ class AICodemaster(Codemaster):
         self.bad_word_dists = None
         self.red_word_dists = None
 
+    def get_name(self):
+        return self.name
+
     def set_game_state(self, words, maps):
         self.words = words
         self.maps = maps

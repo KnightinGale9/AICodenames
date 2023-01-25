@@ -1,22 +1,26 @@
 import subprocess
 import warnings
 warnings.filterwarnings("ignore")
-runtime=15
-seed=450
+runtime=30
+seed=500
 def run():
-    guesserlist = ["players.guesser_glove.AIGuesser","players.guesser_w2v.AIGuesser"
-                    ,"players.guesser_w2vglove.AIGuesser","players.guesser_transformer.AIGuesser"]
-    cmlist= ["players.codemaster_transformer.AICodemaster","players.codemaster_glove_03.AICodemaster",
+    guesserlist = ["players.guesser_glove.AIGuesser","players.guesser_w2v.AIGuesser",
+                    "players.guesser_w2vglove.AIGuesser","players.guesser_wn_jcn.AIGuesser",
+                   "players.guesser_wn_lch.AIGuesser","players.guesser_wn_lin.AIGuesser",
+                   "players.guesser_wn_path.AIGuesser","players.guesser_wn_res.AIGuesser",
+                   "players.guesser_wn_wup.AIGuesser"]
+    cmlist= ["players.codemaster_glove_03.AICodemaster",
             "players.codemaster_glove_05.AICodemaster","players.codemaster_glove_07.AICodemaster",
             "players.codemaster_w2v_03.AICodemaster", "players.codemaster_w2v_05.AICodemaster",
              "players.codemaster_w2v_07.AICodemaster","players.codemaster_w2vglove_03.AICodemaster",
              "players.codemaster_w2vglove_05.AICodemaster","players.codemaster_w2vglove_07.AICodemaster"]
     counter=seed
     for i in range(runtime):
-        for guesser in guesserlist:
-            gamerun("players.codemaster_transformer.AICodemaster", guesser,counter)
         for codemaster in cmlist:
-            gamerun(codemaster,"players.guesser_transformer.AIGuesser", counter)
+            for guesser in guesserlist:
+                gamerun(codemaster, guesser,counter)
+        # for codemaster in cmlist:
+        #     gamerun(codemaster,"players.guesser_glove.AIGuesser", counter)
         counter += 50
 
 def gamerun(codemaster, guesser, seed):

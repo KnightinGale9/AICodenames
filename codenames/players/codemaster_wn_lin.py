@@ -25,7 +25,8 @@ class AICodemaster(Codemaster):
         for word in self.cm_wordlist:
             for synset_in_cmwordlist in wordnet.synsets(word):
                 self.syns.append(synset_in_cmwordlist)
-
+    def get_name(self):
+        return self.name
     def set_game_state(self, words, maps):
         self.words = words
         self.maps = maps

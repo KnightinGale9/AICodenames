@@ -31,7 +31,8 @@ class VectorGuesser(Guesser):
         self.words_on_board = None
 
         self.predicted_guesses = None
-
+    def get_name(self):
+        return self.name
     def set_board(self, words_on_board: List[str]) -> None:
         """Set function for the current game board"""
         self.words_on_board = words_on_board
