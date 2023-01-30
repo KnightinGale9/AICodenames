@@ -1,5 +1,4 @@
-import re
-import sys
+import statistics
 import json
 from mrjob.job import MRJob
 from mrjob.protocol import JSONValueProtocol
@@ -26,19 +25,39 @@ class fullScore(MRJob):
         guesses.sort(key=lambda x: x[1], reverse=True)
         # print(guesses)
         result.append(key)
+        result.append(0)
         result.append(temp)
         for line in guesses:
             y, value = line
             if y == assassin:
+                removal = []
+                for item in result[2]:
+                    if result[2][item]<value+0.05:
+                        removal.append(item)
+                for x in removal:
+                    result[2].pop(x)
                 break
             if y in red:
-                score += value
-                result[1][y] = value
+                result[2][y] = value
             else:
+                removal = []
+
+                for item in result[2]:
+                    if result[2][item] < value + 0.03:
+                        removal.append(item)
+                for x in removal:
+                    result[2].pop(x)
                 break
-        # result.append(len(result))
-        result.append(score)
-        if len(result[1].keys()) > 0:  # and guesses[vallen-1][0] == result[vallen]:
+        result[1] = len(result[2])
+        additive=0
+        for item in result[2]:
+            additive += result[2][item]
+        std=0
+        if len(result[2])>1:
+            std=statistics.stdev(list(result[2].values()))
+        # result.append(0.6*additive+0.3*std+0.1*result[1])
+        result.append(additive+std)
+        if len(result[2].keys()) > 0:  # and guesses[vallen-1][0] == result[vallen]:
             yield key, result
 
 

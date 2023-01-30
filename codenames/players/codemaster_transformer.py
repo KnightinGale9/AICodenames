@@ -41,17 +41,18 @@ class AICodemaster(Codemaster):
         with mr_job.make_runner() as runner:
             runner.run()  # ... etc
             for _, value in mr_job.parse_output(runner.cat_output()):
-                finalguess.append([value[0], len(value[1]), value[1],value[2]])
+                finalguess.append(value)
                 # print(value)
 
         finalguess.sort(key=lambda x: x[1], reverse=True)
         prediction_list = []
         for key, value, valuelist, score in finalguess:
-            prediction_list.append([key, valuelist, score / value + score])
+            prediction_list.append([key, value, score,valuelist])
+            # prediction_list.append([key, value, score / value + score,valuelist])
         prediction_list.sort(key=lambda x: x[2], reverse=True)
         print(prediction_list[:5])
         bestclue = prediction_list[0]
-        return bestclue[0], len(bestclue[1])
+        return bestclue[0], bestclue[1]
 
     def create_boardtransfer(self):
         board_location = [[], [], []]
@@ -85,7 +86,7 @@ class AICodemaster(Codemaster):
             top_results = torch.topk(cosine_scores, k=9)
             for score, idx in zip(top_results[0], top_results[1]):
                 if self.words[idx] in guesses.upper() or guesses.upper() in self.words[idx]:
-                    print(f"removed {self.words[idx]} from {guesses}.")
+                    # print(f"removed {self.words[idx]} from {guesses}.")
                     continue
                 f.write(f"{guesses},{self.words[idx]},{round(float(score), 4)}\n")
         f.close()
