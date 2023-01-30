@@ -48,7 +48,8 @@ class VectorCodemaster(Codemaster):
         with open('players/cm_wordlist.txt') as infile:
             for line in infile:
                 self.cm_word_set.add(line.rstrip().lower())
-
+    def get_name(self):
+        return self.name
     def set_game_state(self, words_on_board: List[str], key_grid: List[str]) -> None:
         """A set function for wordOnBoard and keyGrid (called 'map' in framework) """
         self.words_on_board = words_on_board

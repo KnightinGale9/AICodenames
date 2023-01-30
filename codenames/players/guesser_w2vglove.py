@@ -13,7 +13,8 @@ class AIGuesser(Guesser):
         self.glove_vecs = glove_vecs
         self.word_vectors = word_vectors
         self.num = 0
-
+    def get_name(self):
+        return self.name
     def set_board(self, words):
         self.words = words
 

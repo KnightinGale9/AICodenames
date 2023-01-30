@@ -13,11 +13,11 @@ class SharingExample:
     """Example of how to share vectors, pass kwargs, and call Game directly instead of by terminal"""
 
     start_time = time.time()
-    glove_50d = Game.load_glove_vecs("players/glove.6B.50d.txt")
+    glove_50d = Game.load_glove_vecs("players/glove/glove.6B.50d.txt")
     print(f"{time.time() - start_time:.2f}s to load glove50d")
 
     start_time = time.time()
-    glove_100d = Game.load_glove_vecs("players/glove.6B.100d.txt")
+    glove_100d = Game.load_glove_vecs("players/glove/glove.6B.100d.txt")
     print(f"{time.time() - start_time:.2f}s to load glove100d")
 
     start_time = time.time()
