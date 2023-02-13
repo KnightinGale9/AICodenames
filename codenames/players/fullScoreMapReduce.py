@@ -32,7 +32,7 @@ class fullScore(MRJob):
             if y == assassin:
                 removal = []
                 for item in result[2]:
-                    if result[2][item]<value+0.05:
+                    if result[2][item]<value+0.1:
                         removal.append(item)
                 for x in removal:
                     result[2].pop(x)
@@ -43,7 +43,7 @@ class fullScore(MRJob):
                 removal = []
 
                 for item in result[2]:
-                    if result[2][item] < value + 0.03:
+                    if result[2][item] < value + 0.05:
                         removal.append(item)
                 for x in removal:
                     result[2].pop(x)

@@ -12,6 +12,7 @@ class AICodemaster(Codemaster):
         self.name = "AICodemaster.transformer"
         self.cm_wordlist = []
         self.call = 0
+        # self.given_clue={}
         with open('players/cm_wordlist.txt') as infile:
             for line in infile:
                 self.cm_wordlist.append(line.rstrip())
@@ -52,6 +53,10 @@ class AICodemaster(Codemaster):
         prediction_list.sort(key=lambda x: x[2], reverse=True)
         print(prediction_list[:5])
         bestclue = prediction_list[0]
+        # if bestclue[0] not in self.given_clue:
+        #     self.given_clue[bestclue[0]] ==0
+        # else:
+        #     self.given_clue[bestclue[0]] +=1
         return bestclue[0], bestclue[1]
 
     def create_boardtransfer(self):
