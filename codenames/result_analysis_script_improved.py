@@ -26,6 +26,7 @@ def run():
 
 def gamerun(codemaster, guesser, seed,runnum):
     builder=["python", "run_game.py", codemaster, guesser]
+    glovename=""
     if "w2v" in codemaster or "w2v" in guesser:
         builder.append("--w2v")
         builder.append("players/GoogleNews-vectors-negative300.bin")
@@ -33,16 +34,24 @@ def gamerun(codemaster, guesser, seed,runnum):
         builder.append("--glove")
         if runnum == 0:
             builder.append("players/glove/glove.6B.300d.txt")
+            glovename="glove.6B.300d"
         elif runnum == 1:
             builder.append("players/glove/glove.6B.200d.txt")
+            glovename = "glove.6B.200d"
         elif runnum == 2:
             builder.append("players/glove/glove.6B.100d.txt")
+            glovename = "glove.6B.100d"
         elif runnum == 3:
             builder.append("players/glove/glove.6B.50d.txt")
+            glovename = "glove.6B.50d"
 
     builder.append("--no_print")
     builder.append("--seed")
     builder.append(str(seed))
+    builder.append("--game_name")
+    namestr= glovename
+    builder.append(namestr)
+
     print(builder)
 
     subprocess.run(builder)
