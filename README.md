@@ -220,6 +220,10 @@ Example installation order:
 >>> import nltk
 >>> nltk.download('all')
 >>> exit()
+(codenames) pip install Sentencepiece
+(codenames) pip install mrjob
+(codenames) pip install -U sentence-transformers
+(codenames) pip install transformers
 (codenames) pip install -U colorama
 (codenames) git clone https://github.com/CodenamesAICompetition/Game.git
 (codenames) cd codenames
