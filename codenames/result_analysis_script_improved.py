@@ -17,12 +17,12 @@ def run():
         for guesser in guesserlist:
             for i in range(runtime):
                 gamerun("players.codemaster_transformer.AICodemaster", guesser,counter,temp)
-            counter += 50
+                counter += 50
         counter=seed
         for codemaster in cmlist:
             for i in range(runtime):
                 gamerun(codemaster, "players.guesser_transformer.AIGuesser", counter,temp)
-            counter += 50
+                counter += 50
 
 def gamerun(codemaster, guesser, seed,runnum):
     builder=["python", "run_game.py", codemaster, guesser]
