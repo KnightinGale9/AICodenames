@@ -23,6 +23,7 @@ def run():
             for i in range(runtime):
                 gamerun(codemaster, "players.guesser_transformer.AIGuesser", counter,temp)
                 counter += 50
+    print("This Program has officially ended")
 
 def gamerun(codemaster, guesser, seed,runnum):
     builder=["python", "run_game.py", codemaster, guesser]
@@ -30,6 +31,7 @@ def gamerun(codemaster, guesser, seed,runnum):
     if "w2v" in codemaster or "w2v" in guesser:
         builder.append("--w2v")
         builder.append("players/GoogleNews-vectors-negative300.bin")
+        glovename = "w2v"
     if "glove" in codemaster or "glove" in guesser:
         builder.append("--glove")
         if runnum == 0:
