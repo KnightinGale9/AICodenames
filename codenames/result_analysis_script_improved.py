@@ -13,13 +13,13 @@ def run():
              "players.codemaster_w2v_07.AICodemaster","players.codemaster_w2vglove_03.AICodemaster",
              "players.codemaster_w2vglove_05.AICodemaster","players.codemaster_w2vglove_07.AICodemaster"]
     for temp in range(4):
-        counter=seed
         for guesser in guesserlist:
+            counter = seed
             for i in range(runtime):
                 gamerun("players.codemaster_transformer.AICodemaster", guesser,counter,temp)
                 counter += 50
-        counter=seed
         for codemaster in cmlist:
+            counter = seed
             for i in range(runtime):
                 gamerun(codemaster, "players.guesser_transformer.AIGuesser", counter,temp)
                 counter += 50

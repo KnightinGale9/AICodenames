@@ -48,8 +48,8 @@ class AICodemaster(Codemaster):
         finalguess.sort(key=lambda x: x[1], reverse=True)
         prediction_list = []
         for key, value, valuelist, score in finalguess:
-            prediction_list.append([key, value, score,valuelist])
-            # prediction_list.append([key, value, score / value + score,valuelist])
+            # prediction_list.append([key, value, score,valuelist])
+            prediction_list.append([key, value, score / value + score,valuelist])
         prediction_list.sort(key=lambda x: x[2], reverse=True)
         print(prediction_list[:5])
         bestclue = prediction_list[0]
