@@ -15,8 +15,10 @@ class GameRun:
         parser = argparse.ArgumentParser(
             description="Run the Codenames AI competition game.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-        parser.add_argument("codemaster", help="import string of form A.B.C.MyClass or 'human'")
-        parser.add_argument("guesser", help="import string of form A.B.C.MyClass or 'human'")
+        parser.add_argument("red_codemaster", help="import string of form A.B.C.MyClass or 'human'")
+        parser.add_argument("red_guesser", help="import string of form A.B.C.MyClass or 'human'")
+        parser.add_argument("blue_codemaster", help="import string of form A.B.C.MyClass or 'human'")
+        parser.add_argument("blue_guesser", help="import string of form A.B.C.MyClass or 'human'")
         parser.add_argument("--seed", help="Random seed value for board state -- integer or 'time'", default='time')
 
         parser.add_argument("--w2v", help="Path to w2v file or None", default=None)
@@ -24,6 +26,18 @@ class GameRun:
         parser.add_argument("--wordnet", help="Name of wordnet file or None, most like ic-brown.dat", default=None)
         parser.add_argument("--glove_cm", help="Path to glove file or None", default=None)
         parser.add_argument("--glove_guesser", help="Path to glove file or None", default=None)
+
+        parser.add_argument("--red_w2v", help="Path to w2v file or None", default=None)
+        parser.add_argument("--red_glove", help="Path to glove file or None", default=None)
+        parser.add_argument("--red_wordnet", help="Name of wordnet file or None, most like ic-brown.dat", default=None)
+        parser.add_argument("--red_glove_cm", help="Path to glove file or None", default=None)
+        parser.add_argument("--red_glove_guesser", help="Path to glove file or None", default=None)
+
+        parser.add_argument("--blue_w2v", help="Path to w2v file or None", default=None)
+        parser.add_argument("--blue_glove", help="Path to glove file or None", default=None)
+        parser.add_argument("--blue_wordnet", help="Name of wordnet file or None, most like ic-brown.dat", default=None)
+        parser.add_argument("--blue_glove_cm", help="Path to glove file or None", default=None)
+        parser.add_argument("--blue_glove_guesser", help="Path to glove file or None", default=None)
 
         parser.add_argument("--no_log", help="Supress logging", action='store_true', default=False)
         parser.add_argument("--no_print", help="Supress printing", action='store_true', default=False)
@@ -38,54 +52,135 @@ class GameRun:
             sys.stdout = open(os.devnull, 'w')
         self.game_name = args.game_name
 
-        self.g_kwargs = {}
-        self.cm_kwargs = {}
+        self.red_g_kwargs = {}
+        self.red_cm_kwargs = {}
+        self.blue_g_kwargs = {}
+        self.blue_cm_kwargs = {}
 
         # load codemaster class
-        if args.codemaster == "human":
-            self.codemaster = HumanCodemaster
-            print('human codemaster')
+        print("\nLOADING RED TEAM")
+        if args.red_codemaster == "human":
+            self.red_codemaster = HumanCodemaster
         else:
-            self.codemaster = self.import_string_to_class(args.codemaster)
-            print('loaded codemaster class')
+            self.red_codemaster = self.import_string_to_class(args.red_codemaster)
+        print('loaded red codemaster class:',args.red_codemaster)
 
         # load guesser class
-        if args.guesser == "human":
-            self.guesser = HumanGuesser
-            print('human guesser')
+        if args.red_guesser == "human":
+            self.red_guesser = HumanGuesser
         else:
-            self.guesser = self.import_string_to_class(args.guesser)
-            print('loaded guesser class')
+            self.red_guesser = self.import_string_to_class(args.red_guesser)
+        print('loaded red guesser class:',args.red_guesser)
+
+        print("\nLOADING BLUE TEAM")
+        if args.blue_codemaster == "human":
+            self.blue_codemaster = HumanCodemaster
+        else:
+            self.blue_codemaster = self.import_string_to_class(args.blue_codemaster)
+        print('loaded blue codemaster class:',args.blue_codemaster)
+
+        # load guesser class
+        if args.blue_guesser == "human":
+            self.blue_guesser = HumanGuesser
+        else:
+            self.blue_guesser = self.import_string_to_class(args.blue_guesser)
+        print('loaded blue guesser class:', args.blue_guesser)
 
         # if the game is going to have an ai, load up word vectors
-        if sys.argv[1] != "human" or sys.argv[2] != "human":
+        if sys.argv[1] != "human" or sys.argv[2] != "human" or sys.argv[3] != "human" or sys.argv[4] != "human":
             if args.wordnet is not None:
                 brown_ic = Game.load_wordnet(args.wordnet)
-                self.g_kwargs["brown_ic"] = brown_ic
-                self.cm_kwargs["brown_ic"] = brown_ic
-                print('loaded wordnet')
+                self.red_g_kwargs["brown_ic"] = brown_ic
+                self.red_cm_kwargs["brown_ic"] = brown_ic
+                self.blue_g_kwargs["brown_ic"] = brown_ic
+                self.blue_cm_kwargs["brown_ic"] = brown_ic
+                print('loaded red and blue wordnet')
 
             if args.glove is not None:
                 glove_vectors = Game.load_glove_vecs(args.glove)
-                self.g_kwargs["glove_vecs"] = glove_vectors
-                self.cm_kwargs["glove_vecs"] = glove_vectors
-                print('loaded glove vectors')
+                self.red_g_kwargs["glove_vecs"] = glove_vectors
+                self.red_cm_kwargs["glove_vecs"] = glove_vectors
+                self.blue_g_kwargs["glove_vecs"] = glove_vectors
+                self.blue_cm_kwargs["glove_vecs"] = glove_vectors
+                print('loaded red and blue glove vectors')
 
             if args.w2v is not None:
                 w2v_vectors = Game.load_w2v(args.w2v)
-                self.g_kwargs["word_vectors"] = w2v_vectors
-                self.cm_kwargs["word_vectors"] = w2v_vectors
-                print('loaded word vectors')
+                self.red_g_kwargs["word_vectors"] = w2v_vectors
+                self.red_cm_kwargs["word_vectors"] = w2v_vectors
+                self.blue_g_kwargs["word_vectors"] = w2v_vectors
+                self.blue_cm_kwargs["word_vectors"] = w2v_vectors
+                print('loaded red and blue word vectors')
 
             if args.glove_cm is not None:
                 glove_vectors = Game.load_glove_vecs(args.glove_cm)
-                self.cm_kwargs["glove_vecs"] = glove_vectors
-                print('loaded glove vectors')
+                self.red_cm_kwargs["glove_vecs"] = glove_vectors
+                self.blue_cm_kwargs["glove_vecs"] = glove_vectors
+                print('loaded red and blue glove vectors')
 
             if args.glove_guesser is not None:
                 glove_vectors = Game.load_glove_vecs(args.glove_guesser)
-                self.g_kwargs["glove_vecs"] = glove_vectors
-                print('loaded glove vectors')
+                self.red_g_kwargs["glove_vecs"] = glove_vectors
+                self.blue_g_kwargs["glove_vecs"] = glove_vectors
+                print('loaded red and blue  glove vectors')
+
+
+            if args.red_wordnet is not None:
+                brown_ic = Game.load_wordnet(args.wordnet)
+                self.red_g_kwargs["brown_ic"] = brown_ic
+                self.red_cm_kwargs["brown_ic"] = brown_ic
+                print('loaded red wordnet')
+
+            if args.red_glove is not None:
+                glove_vectors = Game.load_glove_vecs(args.glove)
+                self.red_g_kwargs["glove_vecs"] = glove_vectors
+                self.red_cm_kwargs["glove_vecs"] = glove_vectors
+                print('loaded red glove vectors')
+
+            if args.red_w2v is not None:
+                w2v_vectors = Game.load_w2v(args.w2v)
+                self.red_g_kwargs["word_vectors"] = w2v_vectors
+                self.red_cm_kwargs["word_vectors"] = w2v_vectors
+                print('loaded red word vectors')
+
+            if args.red_glove_cm is not None:
+                glove_vectors = Game.load_glove_vecs(args.glove_cm)
+                self.red_cm_kwargs["glove_vecs"] = glove_vectors
+                print('loaded red glove vectors')
+
+            if args.red_glove_guesser is not None:
+                glove_vectors = Game.load_glove_vecs(args.glove_guesser)
+                self.red_g_kwargs["glove_vecs"] = glove_vectors
+                print('loaded red glove vectors')
+
+
+            if args.blue_wordnet is not None:
+                brown_ic = Game.load_wordnet(args.wordnet)
+                self.blue_g_kwargs["brown_ic"] = brown_ic
+                self.blue_cm_kwargs["brown_ic"] = brown_ic
+                print('loaded blue wordnet')
+
+            if args.blue_glove is not None:
+                glove_vectors = Game.load_glove_vecs(args.glove)
+                self.blue_g_kwargs["glove_vecs"] = glove_vectors
+                self.blue_cm_kwargs["glove_vecs"] = glove_vectors
+                print('loaded blue glove vectors')
+
+            if args.blue_w2v is not None:
+                w2v_vectors = Game.load_w2v(args.w2v)
+                self.blue_g_kwargs["word_vectors"] = w2v_vectors
+                self.blue_cm_kwargs["word_vectors"] = w2v_vectors
+                print('loaded blue word vectors')
+
+            if args.blue_glove_cm is not None:
+                glove_vectors = Game.load_glove_vecs(args.glove_cm)
+                self.blue_cm_kwargs["glove_vecs"] = glove_vectors
+                print('loaded blue glove vectors')
+
+            if args.blue_glove_guesser is not None:
+                glove_vectors = Game.load_glove_vecs(args.glove_guesser)
+                self.blue_g_kwargs["glove_vecs"] = glove_vectors
+                print('loaded blue glove vectors')
 
         # set seed so that board/keygrid can be reloaded later
         if args.seed == 'time':
@@ -114,13 +209,15 @@ class GameRun:
 if __name__ == "__main__":
     game_setup = GameRun()
 
-    game = Game(game_setup.codemaster,
-                game_setup.guesser,
+    game = Game(red_codemaster=game_setup.red_codemaster,red_guesser=game_setup.red_guesser,
+                blue_codemaster=game_setup.blue_codemaster, blue_guesser=game_setup.blue_guesser,
                 seed=game_setup.seed,
                 do_print=game_setup.do_print,
                 do_log=game_setup.do_log,
                 game_name=game_setup.game_name,
-                cm_kwargs=game_setup.cm_kwargs,
-                g_kwargs=game_setup.g_kwargs)
+                red_cm_kwargs=game_setup.red_cm_kwargs,
+                red_g_kwargs=game_setup.red_g_kwargs,
+                blue_cm_kwargs = game_setup.blue_cm_kwargs,
+                blue_g_kwargs = game_setup.blue_g_kwargs)
 
     game.run()

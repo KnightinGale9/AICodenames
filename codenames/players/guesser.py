@@ -52,9 +52,9 @@ class HumanGuesser(Guesser):
     def get_answer(self):
         answer_input = input("Guesser makes turn.\nPlease enter a valid Word >> ")
         type(answer_input)
-        if answer_input == "":
-            return answer_input
         while not self._is_valid(answer_input):
+            if answer_input == "":
+                return answer_input
             print("Input Invalid")
             print(self.words)
             answer_input = input("Please enter a valid Word >> ")

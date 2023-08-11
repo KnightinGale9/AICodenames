@@ -16,8 +16,8 @@ class GameCondition(enum.Enum):
     HIT_RED = 0
     HIT_BLUE = 1
     HIT_ASSASSIN = 2
-    LOSS = 3
-    WIN = 4
+    WIN_RED = 3
+    WIN_BLUE = 4
     CONTINUE = 5
 
 
@@ -25,9 +25,9 @@ class Game:
     """Class that setups up game details and calls Guesser/Codemaster pair to play the game
     """
 
-    def __init__(self, codemaster, guesser,
+    def __init__(self, red_codemaster,red_guesser,blue_codemaster,blue_guesser,
                  seed="time", do_print=True, do_log=True, game_name="default",
-                 cm_kwargs={}, g_kwargs={}):
+                 red_cm_kwargs={}, red_g_kwargs={},blue_cm_kwargs={}, blue_g_kwargs={}):
         """ Setup Game details
 
         Args:
@@ -60,11 +60,13 @@ class Game:
             self._save_stdout = sys.stdout
             sys.stdout = open(os.devnull, 'w')
 
-        self.codemaster = codemaster(**cm_kwargs)
-        self.guesser = guesser(**g_kwargs)
+        self.team = ({"color": GameCondition.HIT_RED, "codemaster": red_codemaster(**red_cm_kwargs),
+                      "guesser": red_guesser(**red_g_kwargs),
+                      "cm_kwargs": red_cm_kwargs, "g_kwargs": red_g_kwargs},
+                     {"color": GameCondition.HIT_BLUE, "codemaster": blue_codemaster(**blue_cm_kwargs),
+                      "guesser": blue_guesser(**blue_g_kwargs),
+                      "cm_kwargs": blue_cm_kwargs, "g_kwargs": blue_g_kwargs})
 
-        self.cm_kwargs = cm_kwargs
-        self.g_kwargs = g_kwargs
         self.do_log = do_log
         self.game_name = game_name
 
@@ -155,7 +157,7 @@ class Game:
         print("\n")
 
     def _display_key_grid(self):
-        """ Print the key grid to stdout  """
+        # """ Print the key grid to stdout  """
         print("\n")
         print(str.center(colorama.Fore.RESET +
                          "____________________________KEY____________________________\n", 55))
@@ -196,25 +198,25 @@ class Game:
         if self.key_grid[guess_index] == "Red":
             self.words_on_board[guess_index] = "*Red*"
             if self.words_on_board.count("*Red*") >= 8:
-                return GameCondition.WIN
+                return GameCondition.WIN_RED
             return GameCondition.HIT_RED
 
         elif self.key_grid[guess_index] == "Blue":
             self.words_on_board[guess_index] = "*Blue*"
             if self.words_on_board.count("*Blue*") >= 7:
-                return GameCondition.LOSS
+                return GameCondition.WIN_BLUE
             else:
-                return GameCondition.CONTINUE
+                return GameCondition.HIT_BLUE
 
         elif self.key_grid[guess_index] == "Assassin":
             self.words_on_board[guess_index] = "*Assassin*"
-            return GameCondition.LOSS
+            return GameCondition.HIT_ASSASSIN
 
         else:
             self.words_on_board[guess_index] = "*Civilian*"
             return GameCondition.CONTINUE
 
-    def write_results(self, num_of_turns):
+    def write_results(self, game_condition,num_of_turns):
         """Logging function
         writes in both the original and a more detailed new style
         """
@@ -233,29 +235,43 @@ class Game:
             elif self.words_on_board[i] == "*Assassin*":
                 assa_result += 1
         total = red_result + blue_result + civ_result + assa_result
+        if game_condition==GameCondition.HIT_RED or game_condition==GameCondition.WIN_RED:
+            winner="RED"
+        else:
+            winner="BLUE"
 
         if not os.path.exists("results"):
             os.mkdir("results")
 
         with open("results/bot_results.txt", "a") as f:
             f.write(
-                f'TOTAL:{num_of_turns} B:{blue_result} C:{civ_result} A:{assa_result}'
-                f' R:{red_result} CM:{self.codemaster.get_name()} '
-                f'GUESSER:{self.guesser.get_name()} SEED:{self.seed}\n'
+                f'WINNER:{winner} TOTAL:{num_of_turns} SEED:{self.seed} '
+                f'R:{red_result}B:{blue_result} C:{civ_result} A:{assa_result}'
+                f' RED_CM:{self.team[0]["codemaster"].get_name()} RED_GUESSER:{self.team[0]["guesser"].get_name()} '
+                f' BLUE_CM:{self.team[1]["codemaster"].get_name()} BLUE_GUESSER:{self.team[1]["guesser"].get_name()} \n'
             )
 
         with open("results/bot_results_new_style.txt", "a") as f:
             results = {"game_name": self.game_name,
                        "total_turns": num_of_turns,
-                       "R": red_result, "B": blue_result, "C": civ_result, "A": assa_result,
-                       "codemaster": self.codemaster.get_name(),
-                       "guesser": self.guesser.get_name(),
+                       "winner": winner,
                        "seed": self.seed,
                        "time_s": (self.game_end_time - self.game_start_time),
-                       "cm_kwargs": {k: v if isinstance(v, float) or isinstance(v, int) or isinstance(v, str) else None
-                                     for k, v in self.cm_kwargs.items()},
-                       "g_kwargs": {k: v if isinstance(v, float) or isinstance(v, int) or isinstance(v, str) else None
-                                    for k, v in self.g_kwargs.items()},
+                       "R": red_result, "B": blue_result, "C": civ_result, "A": assa_result,
+                       "RED_codemaster": self.team[0]["codemaster"].get_name(),
+                       "RED_guesser": self.team[0]["guesser"].get_name(),
+                       "RED_cm_kwargs": {k: v if isinstance(v, float) or isinstance(v, int) or isinstance(v, str) else None
+                                     for k, v in self.team[0]["cm_kwargs"].items()},
+                       "RED_g_kwargs": {k: v if isinstance(v, float) or isinstance(v, int) or isinstance(v, str) else None
+                                    for k, v in self.team[0]["g_kwargs"].items()},
+                       "BLUE_codemaster": self.team[1]["codemaster"].get_name(),
+                       "BLUE_guesser": self.team[1]["guesser"].get_name(),
+                       "BLUE_cm_kwargs": {
+                           k: v if isinstance(v, float) or isinstance(v, int) or isinstance(v, str) else None
+                           for k, v in self.team[1]["cm_kwargs"].items()},
+                       "BLUE_g_kwargs": {
+                           k: v if isinstance(v, float) or isinstance(v, int) or isinstance(v, str) else None
+                           for k, v in self.team[1]["g_kwargs"].items()}
                        }
             f.write(json.dumps(results))
             f.write('\n')
@@ -269,30 +285,32 @@ class Game:
     def run(self):
         """Function that runs the codenames game between codemaster and guesser"""
         game_condition = GameCondition.HIT_RED
-        game_counter = 0
-        while game_condition != GameCondition.LOSS and game_condition != GameCondition.WIN:
+        game_counter = -1
+        while game_condition != GameCondition.HIT_ASSASSIN and game_condition != GameCondition.WIN_RED and game_condition != GameCondition.WIN_BLUE:
             # board setup and display
             print('\n' * 2)
+            game_counter += 1
             words_in_play = self.get_words_on_board()
             current_key_grid = self.get_key_grid()
-            self.codemaster.set_game_state(words_in_play, current_key_grid)
+            self.team[game_counter%2]["codemaster"].set_game_state(words_in_play, current_key_grid)
             self._display_key_grid()
             self._display_board_codemaster()
 
             # codemaster gives clue & number here
-            clue, clue_num = self.codemaster.get_clue()
-            game_counter += 1
+            clue, clue_num = self.team[game_counter%2]["codemaster"].get_clue()
             keep_guessing = True
             guess_num = 0
             clue_num = int(clue_num)
 
             print('\n' * 2)
-            self.guesser.set_clue(clue, clue_num)
+            self.team[game_counter%2]["guesser"].set_clue(clue, clue_num)
 
-            game_condition = GameCondition.HIT_RED
-            while guess_num <= clue_num and keep_guessing and game_condition == GameCondition.HIT_RED:
-                self.guesser.set_board(words_in_play)
-                guess_answer = self.guesser.get_answer()
+            game_condition = self.team[game_counter%2]["color"]
+            print("It is", "RED" if game_condition ==GameCondition.HIT_RED else "BLUE","team's turn." )
+
+            while guess_num <= clue_num and keep_guessing and game_condition == self.team[game_counter%2]["color"]:
+                self.team[game_counter%2]["guesser"].set_board(words_in_play)
+                guess_answer = self.team[game_counter%2]["guesser"].get_answer()
 
                 # if no comparisons were made/found than retry input from codemaster
                 if guess_answer is None or guess_answer == "no comparisons":
@@ -303,30 +321,29 @@ class Game:
                     guess_answer_index = words_in_play.index(guess_answer.upper().strip())
                 game_condition = self._accept_guess(guess_answer_index)
 
-                if game_condition == GameCondition.HIT_RED:
+                if game_condition == self.team[game_counter%2]["color"]:
                     print('\n' * 2)
                     self._display_board_codemaster()
                     guess_num += 1
                     print("Keep Guessing? the clue is ", clue, clue_num)
-                    keep_guessing = self.guesser.keep_guessing()
+                    keep_guessing = self.team[game_counter%2]["guesser"].keep_guessing()
+                elif game_condition == GameCondition.HIT_ASSASSIN:
+                    self.game_end_time = time.time()
+                    self._display_board_codemaster()
+                    if self.do_log:
+                        self.write_results(self.team[game_counter+1 % 2]["color"],game_counter)
+                    if self.team[game_counter % 2]["color"] == GameCondition.HIT_RED:
+                        print("BLUE Team Won")
+                    elif self.team[game_counter % 2]["color"] == GameCondition.HIT_BLUE:
+                        print("RED Team Won")
+                    print("Game Counter:", game_counter)
 
-                # if guesser selected a civilian or a blue-paired word
-                elif game_condition == GameCondition.CONTINUE:
+                elif game_condition == GameCondition.WIN_RED or game_condition == GameCondition.WIN_BLUE:
+                    self.game_end_time = time.time()
+                    self._display_board_codemaster()
+                    if self.do_log:
+                        self.write_results(game_condition,game_counter)
+                    print("RED Team Won") if game_condition == GameCondition.WIN_RED else print("BLUE Team Won")
+                    print("Game Counter:", game_counter)
+                else:
                     break
-
-                elif game_condition == GameCondition.LOSS:
-                    self.game_end_time = time.time()
-                    game_counter = 25
-                    self._display_board_codemaster()
-                    if self.do_log:
-                        self.write_results(game_counter)
-                    print("You Lost")
-                    print("Game Counter:", game_counter)
-
-                elif game_condition == GameCondition.WIN:
-                    self.game_end_time = time.time()
-                    self._display_board_codemaster()
-                    if self.do_log:
-                        self.write_results(game_counter)
-                    print("You Won")
-                    print("Game Counter:", game_counter)
