@@ -235,7 +235,8 @@ class Game:
             elif self.words_on_board[i] == "*Assassin*":
                 assa_result += 1
         total = red_result + blue_result + civ_result + assa_result
-        if game_condition==GameCondition.HIT_RED or game_condition==GameCondition.WIN_RED:
+
+        if game_condition==GameCondition.HIT_BLUE or game_condition==GameCondition.WIN_RED:
             winner="RED"
         else:
             winner="BLUE"
@@ -295,7 +296,7 @@ class Game:
             self.team[game_counter%2]["codemaster"].set_game_state(words_in_play, current_key_grid)
             self._display_key_grid()
             self._display_board_codemaster()
-
+            print("It is", "RED" if game_condition == GameCondition.HIT_RED else "BLUE", "Codemaster's turn.")
             # codemaster gives clue & number here
             clue, clue_num = self.team[game_counter%2]["codemaster"].get_clue()
             keep_guessing = True
@@ -306,7 +307,7 @@ class Game:
             self.team[game_counter%2]["guesser"].set_clue(clue, clue_num)
 
             game_condition = self.team[game_counter%2]["color"]
-            print("It is", "RED" if game_condition ==GameCondition.HIT_RED else "BLUE","team's turn." )
+            print("It is", "RED" if game_condition ==GameCondition.HIT_RED else "BLUE","Guesser's turn." )
 
             while guess_num <= clue_num and keep_guessing and game_condition == self.team[game_counter%2]["color"]:
                 self.team[game_counter%2]["guesser"].set_board(words_in_play)
@@ -331,7 +332,7 @@ class Game:
                     self.game_end_time = time.time()
                     self._display_board_codemaster()
                     if self.do_log:
-                        self.write_results(self.team[game_counter+1 % 2]["color"],game_counter)
+                        self.write_results(self.team[game_counter % 2]["color"],game_counter)
                     if self.team[game_counter % 2]["color"] == GameCondition.HIT_RED:
                         print("BLUE Team Won")
                     elif self.team[game_counter % 2]["color"] == GameCondition.HIT_BLUE:

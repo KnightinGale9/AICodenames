@@ -44,3 +44,19 @@ class HumanCodemaster(Codemaster):
         if len(clue) == 1:
             clue.append('1')
         return clue
+
+class PassCodemaster(Codemaster):
+
+    def __init__(self):
+        super().__init__()
+        pass
+
+    def get_name(self):
+        return "PassCodemaster"
+
+    def set_game_state(self, words_in_play, map_in_play):
+        self.words = words_in_play
+        self.maps = map_in_play
+
+    def get_clue(self):
+        return ["pass",0]

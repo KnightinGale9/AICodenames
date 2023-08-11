@@ -69,3 +69,29 @@ class HumanGuesser(Guesser):
             return True
         else:
             return False
+
+class PassGuesser(Guesser):
+    """Guesser derived class for human interaction"""
+
+    def __init__(self):
+        super().__init__()
+        pass
+
+    def get_name(self):
+        return "Pass"
+
+    def set_clue(self, clue, num):
+        print("The clue is:", clue, num)
+        self.num = num
+
+    def set_board(self, words):
+        self.words = words
+
+    def get_answer(self):
+        return ""
+
+    def keep_guessing(self):
+        return self.num >= 0
+
+    def _is_valid(self, result):
+        return True
