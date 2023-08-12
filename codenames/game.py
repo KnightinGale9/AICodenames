@@ -66,7 +66,7 @@ class Game:
                      {"color": GameCondition.HIT_BLUE, "codemaster": blue_codemaster(**blue_cm_kwargs),
                       "guesser": blue_guesser(**blue_g_kwargs),
                       "cm_kwargs": blue_cm_kwargs, "g_kwargs": blue_g_kwargs})
-
+        print(self.team)
         self.do_log = do_log
         self.game_name = game_name
 
@@ -246,7 +246,7 @@ class Game:
 
         with open("results/bot_results.txt", "a") as f:
             f.write(
-                f'WINNER:{winner} TOTAL:{num_of_turns} SEED:{self.seed} '
+                f'TOTAL:{num_of_turns} WINNER:{winner} SEED:{self.seed} '
                 f'R:{red_result}B:{blue_result} C:{civ_result} A:{assa_result}'
                 f' RED_CM:{self.team[0]["codemaster"].get_name()} RED_GUESSER:{self.team[0]["guesser"].get_name()} '
                 f' BLUE_CM:{self.team[1]["codemaster"].get_name()} BLUE_GUESSER:{self.team[1]["guesser"].get_name()} \n'
@@ -291,10 +291,13 @@ class Game:
             # board setup and display
             print('\n' * 2)
             game_counter += 1
+            game_condition = self.team[game_counter % 2]["color"]
+            if self.team[game_counter % 2]["codemaster"].get_name() == "PassCodemaster":
+                continue
             words_in_play = self.get_words_on_board()
             current_key_grid = self.get_key_grid()
             self.team[game_counter%2]["codemaster"].set_game_state(words_in_play, current_key_grid)
-            self._display_key_grid()
+            # self._display_key_grid()
             self._display_board_codemaster()
             print("It is", "RED" if game_condition == GameCondition.HIT_RED else "BLUE", "Codemaster's turn.")
             # codemaster gives clue & number here
@@ -304,11 +307,12 @@ class Game:
             clue_num = int(clue_num)
 
             print('\n' * 2)
-            self.team[game_counter%2]["guesser"].set_clue(clue, clue_num)
-
-            game_condition = self.team[game_counter%2]["color"]
-            print("It is", "RED" if game_condition ==GameCondition.HIT_RED else "BLUE","Guesser's turn." )
-
+            print("It is", "RED" if game_condition == GameCondition.HIT_RED else "BLUE","Guesser's turn." )
+            if self.team[game_counter % 2]["guesser"].get_name() == "HumanGuesser":
+                self._display_board()
+            else:
+                self._display_board_codemaster()
+            self.team[game_counter % 2]["guesser"].set_clue(clue, clue_num)
             while guess_num <= clue_num and keep_guessing and game_condition == self.team[game_counter%2]["color"]:
                 self.team[game_counter%2]["guesser"].set_board(words_in_play)
                 guess_answer = self.team[game_counter%2]["guesser"].get_answer()
@@ -324,7 +328,10 @@ class Game:
 
                 if game_condition == self.team[game_counter%2]["color"]:
                     print('\n' * 2)
-                    self._display_board_codemaster()
+                    if self.team[game_counter % 2]["guesser"].get_name() == "HumanGuesser":
+                        self._display_board()
+                    else:
+                        self._display_board_codemaster()
                     guess_num += 1
                     print("Keep Guessing? the clue is ", clue, clue_num)
                     keep_guessing = self.team[game_counter%2]["guesser"].keep_guessing()
